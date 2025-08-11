@@ -166,5 +166,10 @@ namespace AppOrganizaciónPendientes
                 }
             }
         }
+
+        private void btnOpenFileLocation_Click(object sender, EventArgs e)
+        {
+
+        }
     }
 }
