@@ -8,6 +8,7 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Data.OleDb;
 using System.Windows.Forms;
+using System.IO;
 
 namespace AppOrganizaciónPendientes
 {
@@ -39,6 +40,26 @@ namespace AppOrganizaciónPendientes
                 this.Text = "Agregar Nueva Tarea";
                 cmbStatus.SelectedItem = "Por Hacer";
             }
+        }
+
+        // --- NUEVO MÉTODO PARA OBTENER Y ACTUALIZAR EL ID ---
+        private int GetNextId()
+        {
+            // El archivo del contador se guardará junto al archivo .exe de la aplicación.
+            string counterFilePath = Path.Combine(Application.StartupPath, "id_counter.txt");
+            int nextId = 1; // Por defecto, el primer ID será 1 si el archivo no existe.
+
+            if (File.Exists(counterFilePath))
+            {
+                // Si el archivo ya existe, leemos el último número guardado y le sumamos 1.
+                int.TryParse(File.ReadAllText(counterFilePath), out int lastId);
+                nextId = lastId + 1;
+            }
+
+            // Escribimos el nuevo último ID en el archivo para la próxima vez.
+            File.WriteAllText(counterFilePath, nextId.ToString());
+
+            return nextId;
         }
 
         private void LoadTaskData()
@@ -96,10 +117,13 @@ namespace AppOrganizaciónPendientes
                     string query = "INSERT INTO [Tareas$] (ID, TaskName, DueDate, Status, Details) VALUES (@ID, @TaskName, @DueDate, @Status, @Details)";
                     OleDbCommand cmd = new OleDbCommand(query, conn);
 
-                    // Usamos Guid para garantizar un ID único y seguro.
-                    cmd.Parameters.AddWithValue("@ID", Guid.NewGuid().ToString());
+                    // --- CAMBIO CLAVE: Obtenemos el nuevo ID autoincremental ---
+                    int newId = GetNextId();
+                    cmd.Parameters.AddWithValue("@ID", newId.ToString()); // Lo guardamos como texto
+
+                    // El resto de los parámetros se mantiene igual
                     cmd.Parameters.AddWithValue("@TaskName", txtTaskName.Text);
-                    cmd.Parameters.AddWithValue("@DueDate", dtpDueDate.Value.ToShortDateString());
+                    cmd.Parameters.AddWithValue("@DueDate", dtpDueDate.Value); // Guardar el objeto DateTime completo es mejor
                     cmd.Parameters.AddWithValue("@Status", cmbStatus.SelectedItem.ToString());
                     cmd.Parameters.AddWithValue("@Details", txtDetails.Text);
 
@@ -126,10 +150,10 @@ namespace AppOrganizaciónPendientes
                     OleDbCommand cmd = new OleDbCommand(query, conn);
 
                     cmd.Parameters.AddWithValue("@TaskName", txtTaskName.Text);
-                    cmd.Parameters.AddWithValue("@DueDate", dtpDueDate.Value.ToShortDateString());
+                    cmd.Parameters.AddWithValue("@DueDate", dtpDueDate.Value); // Guardar el objeto DateTime completo
                     cmd.Parameters.AddWithValue("@Status", cmbStatus.SelectedItem.ToString());
                     cmd.Parameters.AddWithValue("@Details", txtDetails.Text);
-                    cmd.Parameters.AddWithValue("@ID", currentTaskId);
+                    cmd.Parameters.AddWithValue("@ID", currentTaskId); // Usamos el ID existente para la cláusula WHERE
 
                     conn.Open();
                     cmd.ExecuteNonQuery();

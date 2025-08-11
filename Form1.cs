@@ -9,6 +9,7 @@ using System.Threading.Tasks;
 using System.Data.OleDb;
 using System.IO;
 using System.Windows.Forms;
+using System.Diagnostics;
 
 namespace AppOrganizaciónPendientes
 {
@@ -169,7 +170,18 @@ namespace AppOrganizaciónPendientes
 
         private void btnOpenFileLocation_Click(object sender, EventArgs e)
         {
-
+            // Verificamos que el archivo realmente exista antes de intentar abrir su ubicación.
+            if (File.Exists(excelFilePath))
+            {
+                // Usamos "explorer.exe" con el argumento "/select," para abrir la carpeta
+                // y dejar el archivo seleccionado, listo para que el usuario lo vea.
+                Process.Start("explorer.exe", "/select,\"" + excelFilePath + "\"");
+            }
+            else
+            {
+                // Si por alguna razón el archivo no se encuentra, informamos al usuario.
+                MessageBox.Show("No se pudo encontrar el archivo de base de datos.", "Archivo no encontrado", MessageBoxButtons.OK, MessageBoxIcon.Error);
+            }
         }
     }
 }
