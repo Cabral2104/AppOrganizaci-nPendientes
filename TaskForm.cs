@@ -9,6 +9,7 @@ using System.Threading.Tasks;
 using System.Data.OleDb;
 using System.Windows.Forms;
 using System.IO;
+using ClosedXML.Excel; // Agrega esto al inicio del archivo
 
 namespace AppOrganizaciónPendientes
 {
@@ -33,13 +34,14 @@ namespace AppOrganizaciónPendientes
             if (!string.IsNullOrEmpty(currentTaskId))
             {
                 this.Text = "Modificar Tarea";
-                LoadTaskData();
+                LoadTaskDataWithClosedXML();
             }
             else
             {
                 this.Text = "Agregar Nueva Tarea";
                 cmbStatus.SelectedItem = "Por Hacer";
             }
+
         }
 
         // --- NUEVO MÉTODO PARA OBTENER Y ACTUALIZAR EL ID ---
@@ -62,25 +64,34 @@ namespace AppOrganizaciónPendientes
             return nextId;
         }
 
-        private void LoadTaskData()
+       
+
+        private void LoadTaskDataWithClosedXML()
         {
             try
             {
-                using (OleDbConnection conn = new OleDbConnection(connectionString))
+                string excelFilePath = Path.Combine(Application.StartupPath, "TasksDB.xlsx");
+                using (var workbook = new XLWorkbook(excelFilePath))
                 {
-                    string query = "SELECT * FROM [Tareas$] WHERE ID = @ID";
-                    OleDbCommand cmd = new OleDbCommand(query, conn);
-                    cmd.Parameters.AddWithValue("@ID", currentTaskId);
+                    var worksheet = workbook.Worksheet("Tareas");
+                    // Buscar la fila donde la columna A (ID) coincide con currentTaskId
+                    var row = worksheet.RowsUsed()
+                        .FirstOrDefault(r => r.Cell(1).GetValue<string>() == currentTaskId);
 
-                    conn.Open();
-                    OleDbDataReader reader = cmd.ExecuteReader();
-
-                    if (reader.Read())
+                    if (row != null)
                     {
-                        txtTaskName.Text = reader["TaskName"].ToString();
-                        dtpDueDate.Value = Convert.ToDateTime(reader["DueDate"]);
-                        cmbStatus.SelectedItem = reader["Status"].ToString();
-                        txtDetails.Text = reader["Details"].ToString();
+                        txtTaskName.Text = row.Cell(2).GetValue<string>();
+                        // Si la celda está vacía, usa la fecha actual
+                        DateTime fecha;
+                        if (!DateTime.TryParse(row.Cell(3).GetValue<string>(), out fecha))
+                            fecha = DateTime.Now;
+                        dtpDueDate.Value = fecha;
+                        cmbStatus.SelectedItem = row.Cell(4).GetValue<string>();
+                        txtDetails.Text = row.Cell(5).GetValue<string>();
+                    }
+                    else
+                    {
+                        MessageBox.Show("No se encontró la tarea para cargar.", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
                     }
                 }
             }
@@ -100,39 +111,56 @@ namespace AppOrganizaciónPendientes
 
             if (string.IsNullOrEmpty(currentTaskId))
             {
-                AddNewTask();
+                AddNewTaskWithClosedXML();
             }
             else
             {
-                UpdateTask();
+                UpdateTaskWithClosedXML();
             }
         }
 
-        private void AddNewTask()
+      
+
+        private void btnCancel_Click(object sender, EventArgs e)
+        {
+            this.Close();
+        }
+
+        private void AddNewTaskWithClosedXML()
         {
             try
             {
-                using (OleDbConnection conn = new OleDbConnection(connectionString))
+                string excelFilePath = Path.Combine(Application.StartupPath, "TasksDB.xlsx");
+                using (var workbook = new XLWorkbook(excelFilePath))
                 {
-                    string query = "INSERT INTO [Tareas$] (ID, TaskName, DueDate, Status, Details) VALUES (@ID, @TaskName, @DueDate, @Status, @Details)";
-                    OleDbCommand cmd = new OleDbCommand(query, conn);
+                    var worksheet = workbook.Worksheet("Tareas");
+                    var lastRow = worksheet.LastRowUsed()?.RowNumber() ?? 1;
 
-                    // --- CAMBIO CLAVE: Obtenemos el nuevo ID autoincremental ---
                     int newId = GetNextId();
-                    cmd.Parameters.AddWithValue("@ID", newId.ToString()); // Lo guardamos como texto
 
-                    // El resto de los parámetros se mantiene igual
-                    cmd.Parameters.AddWithValue("@TaskName", txtTaskName.Text);
-                    cmd.Parameters.AddWithValue("@DueDate", dtpDueDate.Value); // Guardar el objeto DateTime completo es mejor
-                    cmd.Parameters.AddWithValue("@Status", cmbStatus.SelectedItem.ToString());
-                    cmd.Parameters.AddWithValue("@Details", txtDetails.Text);
+                    // Si es la primera fila, crea los encabezados
+                    if (lastRow == 1 && worksheet.Cell(1, 1).GetValue<string>() != "ID")
+                    {
+                        worksheet.Cell(1, 1).Value = "ID";
+                        worksheet.Cell(1, 2).Value = "TaskName";
+                        worksheet.Cell(1, 3).Value = "DueDate";
+                        worksheet.Cell(1, 4).Value = "Status";
+                        worksheet.Cell(1, 5).Value = "Details";
+                        lastRow = 1;
+                    }
 
-                    conn.Open();
-                    cmd.ExecuteNonQuery();
+                    int newRow = lastRow + 1;
+                    worksheet.Cell(newRow, 1).Value = newId.ToString();
+                    worksheet.Cell(newRow, 2).Value = txtTaskName.Text;
+                    worksheet.Cell(newRow, 3).Value = dtpDueDate.Value.Date; // Solo la fecha, hora en 00:00:00
+                    worksheet.Cell(newRow, 4).Value = cmbStatus.SelectedItem.ToString();
+                    worksheet.Cell(newRow, 5).Value = txtDetails.Text;
 
-                    MessageBox.Show("Tarea agregada correctamente.", "Éxito", MessageBoxButtons.OK, MessageBoxIcon.Information);
-                    this.Close();
+                    workbook.Save();
                 }
+
+                MessageBox.Show("Tarea agregada correctamente.", "Éxito", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                this.Close();
             }
             catch (Exception ex)
             {
@@ -140,37 +168,39 @@ namespace AppOrganizaciónPendientes
             }
         }
 
-        private void UpdateTask()
+        private void UpdateTaskWithClosedXML()
         {
             try
             {
-                using (OleDbConnection conn = new OleDbConnection(connectionString))
+                string excelFilePath = Path.Combine(Application.StartupPath, "TasksDB.xlsx");
+                using (var workbook = new XLWorkbook(excelFilePath))
                 {
-                    string query = "UPDATE [Tareas$] SET TaskName = @TaskName, DueDate = @DueDate, Status = @Status, Details = @Details WHERE ID = @ID";
-                    OleDbCommand cmd = new OleDbCommand(query, conn);
+                    var worksheet = workbook.Worksheet("Tareas");
+                    // Buscar la fila donde la columna A (ID) coincide con currentTaskId
+                    var rowToUpdate = worksheet.RowsUsed()
+                        .FirstOrDefault(r => r.Cell(1).GetValue<string>() == currentTaskId);
 
-                    cmd.Parameters.AddWithValue("@TaskName", txtTaskName.Text);
-                    cmd.Parameters.AddWithValue("@DueDate", dtpDueDate.Value); // Guardar el objeto DateTime completo
-                    cmd.Parameters.AddWithValue("@Status", cmbStatus.SelectedItem.ToString());
-                    cmd.Parameters.AddWithValue("@Details", txtDetails.Text);
-                    cmd.Parameters.AddWithValue("@ID", currentTaskId); // Usamos el ID existente para la cláusula WHERE
+                    if (rowToUpdate != null)
+                    {
+                        rowToUpdate.Cell(2).Value = txtTaskName.Text;
+                        rowToUpdate.Cell(3).Value = dtpDueDate.Value.Date; // Solo la fecha, hora en 00:00:00
+                        rowToUpdate.Cell(4).Value = cmbStatus.SelectedItem.ToString();
+                        rowToUpdate.Cell(5).Value = txtDetails.Text;
 
-                    conn.Open();
-                    cmd.ExecuteNonQuery();
-
-                    MessageBox.Show("Tarea actualizada correctamente.", "Éxito", MessageBoxButtons.OK, MessageBoxIcon.Information);
-                    this.Close();
+                        workbook.Save();
+                        MessageBox.Show("Tarea actualizada correctamente.", "Éxito", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                        this.Close();
+                    }
+                    else
+                    {
+                        MessageBox.Show("No se encontró la tarea para actualizar.", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                    }
                 }
             }
             catch (Exception ex)
             {
                 MessageBox.Show("Error al actualizar la tarea: " + ex.Message);
             }
-        }
-
-        private void btnCancel_Click(object sender, EventArgs e)
-        {
-            this.Close();
         }
     }
 }

@@ -10,6 +10,7 @@ using System.Data.OleDb;
 using System.IO;
 using System.Windows.Forms;
 using System.Diagnostics;
+using ClosedXML.Excel;
 
 namespace AppOrganizaciónPendientes
 {
@@ -75,14 +76,15 @@ namespace AppOrganizaciónPendientes
             }
         }
 
-        // --- LÓGICA PARA CARGAR TAREAS ---
+        // Mueve la línea de formato de columna al método LoadAllTasks, después de asignar el DataSource.
+        // Así se asegura que dgvToDo y sus columnas existen y están inicializadas.
+
         private void LoadAllTasks()
         {
             try
             {
                 using (OleDbConnection conn = new OleDbConnection(connectionString))
                 {
-                    // Obtenemos TODAS las tareas en un solo DataTable.
                     OleDbCommand cmd = new OleDbCommand("SELECT * FROM [Tareas$]", conn);
                     conn.Open();
 
@@ -90,16 +92,19 @@ namespace AppOrganizaciónPendientes
                     OleDbDataAdapter adapter = new OleDbDataAdapter(cmd);
                     adapter.Fill(allTasksDt);
 
-                    // Creamos "vistas" filtradas de la tabla principal para cada estado.
-                    // Esto es mucho más eficiente que hacer tres consultas separadas a la base de datos.
                     DataView toDoView = new DataView(allTasksDt) { RowFilter = "Status = 'Por Hacer'" };
                     DataView inProgressView = new DataView(allTasksDt) { RowFilter = "Status = 'En Proceso'" };
                     DataView doneView = new DataView(allTasksDt) { RowFilter = "Status = 'Hecho'" };
 
-                    // Asignamos cada vista a su DataGridView correspondiente.
                     dgvToDo.DataSource = toDoView;
                     dgvInProgress.DataSource = inProgressView;
                     dgvDone.DataSource = doneView;
+
+                    // --- CORRECCIÓN: Formato de fecha en la columna DueDate ---
+                    if (dgvToDo.Columns["DueDate"] != null)
+                    {
+                        dgvToDo.Columns["DueDate"].DefaultCellStyle.Format = "dd/MM/yyyy";
+                    }
                 }
             }
             catch (Exception ex)
@@ -135,9 +140,9 @@ namespace AppOrganizaciónPendientes
 
         private void btnDeleteTask_Click(object sender, EventArgs e)
         {
-            DataGridView activeDgv = tabControlMain.SelectedTab.Controls[0] as DataGridView;
+            DataGridView activeDgv = GetActiveDataGridView();
 
-            if (activeDgv.CurrentRow == null)
+            if (activeDgv == null || activeDgv.CurrentRow == null)
             {
                 MessageBox.Show("Por favor, selecciona una tarea para eliminar.", "Aviso", MessageBoxButtons.OK, MessageBoxIcon.Information);
                 return;
@@ -147,24 +152,9 @@ namespace AppOrganizaciónPendientes
 
             if (confirmation == DialogResult.Yes)
             {
-                try
-                {
-                    string taskId = activeDgv.CurrentRow.Cells["ID"].Value.ToString();
-                    using (OleDbConnection conn = new OleDbConnection(connectionString))
-                    {
-                        string query = "DELETE FROM [Tareas$] WHERE ID = @ID";
-                        OleDbCommand cmd = new OleDbCommand(query, conn);
-                        cmd.Parameters.AddWithValue("@ID", taskId);
-
-                        conn.Open();
-                        cmd.ExecuteNonQuery();
-                    }
-                    LoadAllTasks();
-                }
-                catch (Exception ex)
-                {
-                    MessageBox.Show("Error al eliminar la tarea: " + ex.Message, "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
-                }
+                string taskId = activeDgv.CurrentRow.Cells["ID"].Value.ToString();
+                DeleteTaskFromExcel(taskId);
+                LoadAllTasks();
             }
         }
 
@@ -181,6 +171,38 @@ namespace AppOrganizaciónPendientes
             {
                 // Si por alguna razón el archivo no se encuentra, informamos al usuario.
                 MessageBox.Show("No se pudo encontrar el archivo de base de datos.", "Archivo no encontrado", MessageBoxButtons.OK, MessageBoxIcon.Error);
+            }
+        }
+
+        private DataGridView GetActiveDataGridView()
+        {
+            foreach (Control ctrl in tabControlMain.SelectedTab.Controls)
+            {
+                if (ctrl is DataGridView dgv)
+                    return dgv;
+            }
+            return null;
+        }
+
+
+        private void DeleteTaskFromExcel(string taskId)
+        {
+            try
+            {
+                using (var workbook = new XLWorkbook(excelFilePath))
+                {
+                    var worksheet = workbook.Worksheet("Tareas");
+                    var rows = worksheet.RowsUsed().Where(r => r.Cell("A").GetValue<string>() == taskId).ToList();
+
+                    foreach (var row in rows)
+                        row.Delete();
+
+                    workbook.Save();
+                }
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show("Error al eliminar la tarea en Excel: " + ex.Message, "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
             }
         }
     }

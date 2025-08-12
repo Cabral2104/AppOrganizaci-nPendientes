@@ -64,20 +64,22 @@
             this.tableLayoutPanel1.Controls.Add(this.btnOpenFileLocation, 3, 1);
             this.tableLayoutPanel1.Dock = System.Windows.Forms.DockStyle.Fill;
             this.tableLayoutPanel1.Location = new System.Drawing.Point(0, 0);
+            this.tableLayoutPanel1.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
             this.tableLayoutPanel1.Name = "tableLayoutPanel1";
             this.tableLayoutPanel1.RowCount = 2;
             this.tableLayoutPanel1.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 90F));
             this.tableLayoutPanel1.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 10F));
-            this.tableLayoutPanel1.Size = new System.Drawing.Size(765, 387);
+            this.tableLayoutPanel1.Size = new System.Drawing.Size(1020, 476);
             this.tableLayoutPanel1.TabIndex = 1;
             this.tableLayoutPanel1.Paint += new System.Windows.Forms.PaintEventHandler(this.tableLayoutPanel1_Paint);
             // 
             // btnAddTask
             // 
             this.btnAddTask.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.btnAddTask.Location = new System.Drawing.Point(3, 351);
+            this.btnAddTask.Location = new System.Drawing.Point(4, 432);
+            this.btnAddTask.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
             this.btnAddTask.Name = "btnAddTask";
-            this.btnAddTask.Size = new System.Drawing.Size(185, 33);
+            this.btnAddTask.Size = new System.Drawing.Size(247, 40);
             this.btnAddTask.TabIndex = 3;
             this.btnAddTask.Text = "Agregar Tarea";
             this.btnAddTask.UseVisualStyleBackColor = true;
@@ -86,10 +88,10 @@
             // btnModifyTask
             // 
             this.btnModifyTask.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.btnModifyTask.Location = new System.Drawing.Point(193, 350);
-            this.btnModifyTask.Margin = new System.Windows.Forms.Padding(2, 2, 2, 2);
+            this.btnModifyTask.Location = new System.Drawing.Point(258, 430);
+            this.btnModifyTask.Margin = new System.Windows.Forms.Padding(3, 2, 3, 2);
             this.btnModifyTask.Name = "btnModifyTask";
-            this.btnModifyTask.Size = new System.Drawing.Size(187, 35);
+            this.btnModifyTask.Size = new System.Drawing.Size(249, 44);
             this.btnModifyTask.TabIndex = 4;
             this.btnModifyTask.Text = "Modificar Tarea";
             this.btnModifyTask.UseVisualStyleBackColor = true;
@@ -98,10 +100,10 @@
             // btnDeleteTask
             // 
             this.btnDeleteTask.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.btnDeleteTask.Location = new System.Drawing.Point(384, 350);
-            this.btnDeleteTask.Margin = new System.Windows.Forms.Padding(2, 2, 2, 2);
+            this.btnDeleteTask.Location = new System.Drawing.Point(513, 430);
+            this.btnDeleteTask.Margin = new System.Windows.Forms.Padding(3, 2, 3, 2);
             this.btnDeleteTask.Name = "btnDeleteTask";
-            this.btnDeleteTask.Size = new System.Drawing.Size(187, 35);
+            this.btnDeleteTask.Size = new System.Drawing.Size(249, 44);
             this.btnDeleteTask.TabIndex = 5;
             this.btnDeleteTask.Text = "Eliminar Tarea";
             this.btnDeleteTask.UseVisualStyleBackColor = true;
@@ -114,19 +116,21 @@
             this.tabControlMain.Controls.Add(this.tabPageInProgress);
             this.tabControlMain.Controls.Add(this.tabPageDone);
             this.tabControlMain.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.tabControlMain.Location = new System.Drawing.Point(3, 3);
+            this.tabControlMain.Location = new System.Drawing.Point(4, 4);
+            this.tabControlMain.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
             this.tabControlMain.Name = "tabControlMain";
             this.tabControlMain.SelectedIndex = 0;
-            this.tabControlMain.Size = new System.Drawing.Size(759, 342);
+            this.tabControlMain.Size = new System.Drawing.Size(1012, 420);
             this.tabControlMain.TabIndex = 1;
             // 
             // tabPageToDo
             // 
             this.tabPageToDo.Controls.Add(this.dgvToDo);
-            this.tabPageToDo.Location = new System.Drawing.Point(4, 22);
+            this.tabPageToDo.Location = new System.Drawing.Point(4, 25);
+            this.tabPageToDo.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
             this.tabPageToDo.Name = "tabPageToDo";
-            this.tabPageToDo.Padding = new System.Windows.Forms.Padding(3, 3, 3, 3);
-            this.tabPageToDo.Size = new System.Drawing.Size(751, 316);
+            this.tabPageToDo.Padding = new System.Windows.Forms.Padding(4, 4, 4, 4);
+            this.tabPageToDo.Size = new System.Drawing.Size(1004, 391);
             this.tabPageToDo.TabIndex = 0;
             this.tabPageToDo.Text = "Tareas por Hacer";
             this.tabPageToDo.UseVisualStyleBackColor = true;
@@ -136,20 +140,23 @@
             this.dgvToDo.AllowUserToAddRows = false;
             this.dgvToDo.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.AutoSize;
             this.dgvToDo.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.dgvToDo.Location = new System.Drawing.Point(3, 3);
+            this.dgvToDo.Location = new System.Drawing.Point(4, 4);
+            this.dgvToDo.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
             this.dgvToDo.Name = "dgvToDo";
             this.dgvToDo.ReadOnly = true;
+            this.dgvToDo.RowHeadersWidth = 51;
             this.dgvToDo.RowTemplate.Height = 24;
-            this.dgvToDo.Size = new System.Drawing.Size(745, 310);
+            this.dgvToDo.Size = new System.Drawing.Size(996, 383);
             this.dgvToDo.TabIndex = 0;
             // 
             // tabPageInProgress
             // 
             this.tabPageInProgress.Controls.Add(this.dgvInProgress);
-            this.tabPageInProgress.Location = new System.Drawing.Point(4, 22);
+            this.tabPageInProgress.Location = new System.Drawing.Point(4, 25);
+            this.tabPageInProgress.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
             this.tabPageInProgress.Name = "tabPageInProgress";
-            this.tabPageInProgress.Padding = new System.Windows.Forms.Padding(3, 3, 3, 3);
-            this.tabPageInProgress.Size = new System.Drawing.Size(751, 315);
+            this.tabPageInProgress.Padding = new System.Windows.Forms.Padding(4, 4, 4, 4);
+            this.tabPageInProgress.Size = new System.Drawing.Size(1004, 391);
             this.tabPageInProgress.TabIndex = 1;
             this.tabPageInProgress.Text = "En Proceso";
             this.tabPageInProgress.UseVisualStyleBackColor = true;
@@ -159,20 +166,23 @@
             this.dgvInProgress.AllowUserToAddRows = false;
             this.dgvInProgress.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.AutoSize;
             this.dgvInProgress.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.dgvInProgress.Location = new System.Drawing.Point(3, 3);
+            this.dgvInProgress.Location = new System.Drawing.Point(4, 4);
+            this.dgvInProgress.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
             this.dgvInProgress.Name = "dgvInProgress";
             this.dgvInProgress.ReadOnly = true;
+            this.dgvInProgress.RowHeadersWidth = 51;
             this.dgvInProgress.RowTemplate.Height = 24;
-            this.dgvInProgress.Size = new System.Drawing.Size(745, 309);
+            this.dgvInProgress.Size = new System.Drawing.Size(996, 383);
             this.dgvInProgress.TabIndex = 0;
             // 
             // tabPageDone
             // 
             this.tabPageDone.Controls.Add(this.dgvDone);
-            this.tabPageDone.Location = new System.Drawing.Point(4, 22);
+            this.tabPageDone.Location = new System.Drawing.Point(4, 25);
+            this.tabPageDone.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
             this.tabPageDone.Name = "tabPageDone";
-            this.tabPageDone.Padding = new System.Windows.Forms.Padding(3, 3, 3, 3);
-            this.tabPageDone.Size = new System.Drawing.Size(751, 315);
+            this.tabPageDone.Padding = new System.Windows.Forms.Padding(4, 4, 4, 4);
+            this.tabPageDone.Size = new System.Drawing.Size(1004, 392);
             this.tabPageDone.TabIndex = 2;
             this.tabPageDone.Text = "Completado";
             this.tabPageDone.UseVisualStyleBackColor = true;
@@ -182,19 +192,22 @@
             this.dgvDone.AllowUserToAddRows = false;
             this.dgvDone.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.AutoSize;
             this.dgvDone.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.dgvDone.Location = new System.Drawing.Point(3, 3);
+            this.dgvDone.Location = new System.Drawing.Point(4, 4);
+            this.dgvDone.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
             this.dgvDone.Name = "dgvDone";
             this.dgvDone.ReadOnly = true;
+            this.dgvDone.RowHeadersWidth = 51;
             this.dgvDone.RowTemplate.Height = 24;
-            this.dgvDone.Size = new System.Drawing.Size(745, 309);
+            this.dgvDone.Size = new System.Drawing.Size(996, 384);
             this.dgvDone.TabIndex = 0;
             // 
             // btnOpenFileLocation
             // 
             this.btnOpenFileLocation.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.btnOpenFileLocation.Location = new System.Drawing.Point(576, 351);
+            this.btnOpenFileLocation.Location = new System.Drawing.Point(769, 432);
+            this.btnOpenFileLocation.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
             this.btnOpenFileLocation.Name = "btnOpenFileLocation";
-            this.btnOpenFileLocation.Size = new System.Drawing.Size(186, 33);
+            this.btnOpenFileLocation.Size = new System.Drawing.Size(247, 40);
             this.btnOpenFileLocation.TabIndex = 6;
             this.btnOpenFileLocation.Text = "Abrir Ubicación del Archivo";
             this.btnOpenFileLocation.UseVisualStyleBackColor = true;
@@ -202,10 +215,11 @@
             // 
             // MainForm
             // 
-            this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
+            this.AutoScaleDimensions = new System.Drawing.SizeF(8F, 16F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(765, 387);
+            this.ClientSize = new System.Drawing.Size(1020, 476);
             this.Controls.Add(this.tableLayoutPanel1);
+            this.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
             this.Name = "MainForm";
             this.StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen;
             this.Text = "Organizador";
